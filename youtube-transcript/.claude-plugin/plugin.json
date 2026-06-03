@@ -1,7 +1,7 @@
 {
   "name": "youtube-transcript",
-  "version": "0.2.0",
-  "description": "Extract a YouTube video's transcript to a .txt via existing captions (fast path), with an optional local Whisper fallback when none exist. Standalone CLI: yt-transcript.",
+  "version": "0.3.0",
+  "description": "Extract a YouTube video's transcript to a .txt/.md via existing captions (fast path), with an optional local Whisper fallback. Optional YAML front matter, per-line timestamps, and chapter sections. Standalone CLI: yt-transcript.",
   "author": {
     "name": "Julian Tedstone",
     "email": "ted@nopilot.co"
@@ -13,6 +13,9 @@
     "captions",
     "subtitles",
     "whisper",
-    "ingest"
+    "ingest",
+    "frontmatter",
+    "chapters",
+    "timestamps"
   ]
 }

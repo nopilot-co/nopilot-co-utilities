@@ -25,12 +25,20 @@ python3 youtube-transcript/scripts/extract.py "https://www.youtube.com/watch?v=I
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--out` | `transcript.txt` | Output file path |
+| `--out` | `transcript.txt` | Output file path (use `.md` with front matter/chapters) |
 | `--lang` | `en` | Comma-separated language priority, e.g. `de,en` |
 | `--paragraph` | off | Collapse caption lines into continuous prose |
 | `--fallback` | off | If no captions, download audio and transcribe with faster-whisper |
 | `--whisper-model` | `base` | `tiny`\|`base`\|`small`\|`medium`\|`large-v3`\|`turbo` |
 | `--keep-audio` | off | Keep the downloaded mp3 instead of using a temp dir |
+| `--front-matter` | off | Prepend a YAML block (`url`, `session_title`, `channel`, `duration`, …) |
+| `--timestamps` | off | Prefix each line/paragraph with its `[M:SS]` timestamp |
+| `--chapters` | off | Split body into `## [M:SS] Title` sections + a `chapters:` list (implies front matter + timestamps) |
+| `--chapter-interval` | `5` | Minutes per segment for the fixed-interval chapter fallback |
+| `--chapters-json` | — | JSON list of `{time, title}` boundaries to render verbatim |
+| `--session-title` | video title | Front-matter `session_title` override |
+| `--speaker` | — | Front-matter `speaker` (can't be derived — pass it in) |
+| `--event` | — | Front-matter `event` (can't be derived — pass it in) |
 
 Exit codes: `0` success · `2` no captions (re-run with `--fallback`) · `3` error.
 
@@ -48,7 +56,48 @@ yt-transcript "https://youtu.be/ID" --fallback --whisper-model small --out talk.
 
 # Keep the downloaded audio next to the transcript
 yt-transcript "https://youtu.be/ID" --fallback --keep-audio --out talk.txt
+
+# Markdown with YAML front matter + chapters (native YT chapters, else 5-min segments)
+yt-transcript "https://youtu.be/ID" --chapters \
+  --speaker "Eleanor Dorfman, Head of Industries, Anthropic" --event "SaaStr AI 2026" \
+  --out talk.md
+
+# Natural chapters: render exact boundaries you supply (M:SS / H:MM:SS / seconds)
+yt-transcript "https://youtu.be/ID" --chapters-json chapters.json --out talk.md
 ```
+
+A front-matter + chapters run produces, e.g.:
+
+```yaml
+---
+url: https://www.youtube.com/watch?v=ra0-ZvVApGk
+video_id: ra0-ZvVApGk
+session_title: How Anthropic's Head of Industries Built an AI-Native Sales Org from Scratch
+speaker: Eleanor Dorfman, Head of Industries, Anthropic
+event: SaaStr AI 2026
+channel: SaaStr AI
+duration: 30:40 (1,840s)
+language: en
+source: captions:en
+extracted: 2026-06-04
+chapters:
+  - time: "00:00"
+    title: Introduction & Anthropic's commercial journey
+  - time: "03:30"
+    title: Hiring for an AI-native sales team
+---
+
+## [00:00] Introduction & Anthropic's commercial journey
+
+[00:01] Give a warm welcome to Anthropic's head of industries, Eleanor Dorfman.
+…
+```
+
+> `session_title` and `channel` are fetched keyless via YouTube's oEmbed endpoint;
+> `speaker`/`event` can't be derived, so pass them with `--speaker`/`--event` (in the
+> skill, Claude infers them from the transcript when you don't). For *natural*
+> chapter titles, supply boundaries via `--chapters-json` — bare `--chapters` only
+> uses creator-defined YouTube chapters or fixed-interval segments.
 
 **Behaviour notes:**
 - Accepts full URLs (`watch?v=`, `youtu.be/`, `/shorts/`, `/embed/`, `/clip/`) or a bare 11-char ID.

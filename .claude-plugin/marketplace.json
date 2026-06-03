@@ -10,10 +10,10 @@
     {
       "name": "youtube-transcript",
       "source": "./youtube-transcript",
-      "version": "0.2.0",
-      "description": "Extract a YouTube video's transcript to a .txt — captions fast-path + optional local Whisper fallback. Standalone CLI: yt-transcript.",
+      "version": "0.3.0",
+      "description": "Extract a YouTube video's transcript to a .txt/.md — captions fast-path + optional local Whisper fallback, plus optional YAML front matter, timestamps & chapter sections. Standalone CLI: yt-transcript.",
       "category": "utilities",
-      "tags": ["youtube", "transcript", "captions", "subtitles", "ingest"]
+      "tags": ["youtube", "transcript", "captions", "subtitles", "ingest", "frontmatter", "chapters", "timestamps"]
     }
   ]
 }
