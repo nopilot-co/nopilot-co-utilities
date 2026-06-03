@@ -7,6 +7,7 @@ Each utility is a **self-contained plugin** in its own top-level directory, with
 | Plugin | Standalone CLI | What it does |
 |---|---|---|
 | **youtube-transcript** | `yt-transcript` | Extract a YouTube video's transcript to a `.txt`. |
+| **notion-sources** | `notion-sources` | Extract a Notion database into a batch of per-source `.md` files + a manifest. |
 
 ## Skills
 
@@ -103,6 +104,83 @@ chapters:
 - Accepts full URLs (`watch?v=`, `youtu.be/`, `/shorts/`, `/embed/`, `/clip/`) or a bare 11-char ID.
 - If the requested `--lang` isn't published but other caption tracks exist, it uses the first available track and reports which (`via captions:<lang>`) rather than failing.
 - Exit `2` (`NO_CAPTIONS`) means captions are genuinely absent/disabled — re-run with `--fallback`. Real failures (private/removed video, IP block) return exit `3` and are **not** routed into the audio fallback.
+
+### notion-sources
+
+Extract a Notion database into a **batch** of per-source Markdown files plus a
+manifest, ready for a downstream batch operation (scrape/enrich/transcribe each
+source). One `NNNN-<slug>.md` per row — YAML front matter + a readable stub — alongside
+`sources.json` (machine list) and `index.md` (human table).
+
+**Schema-agnostic.** It does not assume column names. Per row it detects the source
+URL anywhere (a `url`-typed column, else a URL in the title, else any URL in another
+field), maps metadata (`status`, `category`, `tags`, `precis`, `favorite`, `archived`,
+`created`, `topics`/`content` relations) by property **type + fuzzy name**, leaves
+unknown fields null, and preserves every original column under a `properties:` block —
+so it handles differently-structured databases gracefully. Rows with no detectable URL
+are skipped and counted. `author`/`author_profile_url` are derived from the URL where
+the host exposes it (LinkedIn, X/Twitter, YouTube via oEmbed, Medium, Substack, GitHub).
+
+**Incremental.** Re-running **appends** only sources not already in the batch (dedupe by
+Notion page id, URL secondary); existing files and numbering are preserved. `--fresh`
+rebuilds from scratch.
+
+Credentials come from the environment (or `--token` / `--database`, or a `.env`):
+
+```bash
+export NOPILOT_NOTION_API_KEY=ntn_...
+export NOPILOT_NOTION_SOURCE_DATABASE_ID=...        # misspelled …DATABASAE_ID also accepted
+notion-sources --out sources/                        # after install.sh
+python3 notion-sources/scripts/extract.py --out sources/   # from a checkout
+notion-sources --env-file ~/projects/.env --out sources/   # load creds from a .env
+```
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--out` | `sources` | Output directory for the batch |
+| `--database` | env | Notion database id (else `NOPILOT_NOTION_SOURCE_DATABASE_ID`) |
+| `--token` | env | Integration token (else `NOPILOT_NOTION_API_KEY`) |
+| `--env-file` | `./.env` | `.env` to load (real env vars take precedence) |
+| `--include-archived` | off | Include rows flagged archived |
+| `--status NAME` | — | Only rows with this status (repeatable) |
+| `--category NAME` | — | Only rows with this category |
+| `--favorite` | off | Only rows flagged favorite |
+| `--limit N` | `0` (all) | Stop after N new rows (trial runs) |
+| `--no-relations` | off | Store relation ids instead of resolving to page titles |
+| `--fresh` | off | Rebuild the batch instead of appending |
+
+Exit codes: `0` success · `2` auth/permission failure (bad token or DB not shared with
+the integration — nothing written) · `3` error.
+
+A row produces, e.g.:
+
+```yaml
+---
+id: 371bc247-1b97-81b7-9903-dec6d38c3deb
+url: https://www.linkedin.com/posts/fivosaresti_abm-is-the-best-gtm-strategy-...
+title: ABM is the best GTM strategy for companies...
+author: fivosaresti
+author_profile_url: https://www.linkedin.com/in/fivosaresti
+status: Unsorted
+category: null
+tags: []
+topics: []
+content: []
+precis: ""
+favorite: false
+archived: false
+created: 2026-05-31
+source_domain: linkedin.com
+notion_url: https://www.notion.so/371bc247...
+extracted: 2026-06-04T...Z
+properties:
+  Source: ""
+---
+```
+
+> The integration must be **shared with the database** (Notion → ⋯ → Connections) or
+> the API returns 404/403 and the run exits `2`. The token is read from the environment
+> and never printed.
 
 ## Install
 

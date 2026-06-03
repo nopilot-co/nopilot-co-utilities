@@ -1,0 +1,21 @@
+{
+  "name": "notion-sources",
+  "version": "0.1.0",
+  "description": "Extract a Notion database into a batch of per-source Markdown files (one per row, YAML front matter) plus a manifest (sources.json + index.md). Schema-agnostic: detects URLs anywhere in a row and maps metadata by property type + fuzzy name, so it handles differently-structured databases gracefully. Incremental: re-runs append new sources to an existing batch. Standalone CLI: notion-sources.",
+  "author": {
+    "name": "Julian Tedstone",
+    "email": "ted@nopilot.co"
+  },
+  "homepage": "https://github.com/nopilot-co/nopilot-co-utilities/tree/main/notion-sources",
+  "keywords": [
+    "notion",
+    "ingest",
+    "sources",
+    "batch",
+    "manifest",
+    "frontmatter",
+    "extract",
+    "urls",
+    "schema-agnostic"
+  ]
+}

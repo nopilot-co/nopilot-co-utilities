@@ -1,0 +1,18 @@
+# notion-sources has NO third-party Python dependencies.
+#
+# It talks to the Notion HTTP API and renders YAML/Markdown using only the
+# Python standard library (urllib, json, re, datetime). Python >= 3.8.
+#
+# Auth is read from the environment (no SDK):
+#   NOPILOT_NOTION_API_KEY            — Notion integration token (ntn_… / secret_…)
+#   NOPILOT_NOTION_SOURCE_DATABASE_ID — database id to extract
+# The legacy/misspelled NOPILOT_NOTION_SOURCE_DATABASAE_ID and the generic
+# NOTION_API_KEY / NOTION_TOKEN / NOTION_DATABASE_ID names are also accepted.
+#
+# TLS: the script verifies HTTPS using, in order, truststore (system trust
+# store) -> certifi -> the stdlib default CA. On a bare macOS python.org build
+# the stdlib default has no CA bundle, so one of these is needed. Most envs
+# already ship certifi; if you hit CERTIFICATE_VERIFY_FAILED, install either:
+#   pip install certifi
+#   pip install truststore   # preferred — uses the OS trust store
+# (TLS verification is always on; there is no opt-out.)

@@ -14,6 +14,14 @@
       "description": "Extract a YouTube video's transcript to a .txt/.md — captions fast-path + optional local Whisper fallback, plus optional YAML front matter, timestamps & chapter sections. Standalone CLI: yt-transcript.",
       "category": "utilities",
       "tags": ["youtube", "transcript", "captions", "subtitles", "ingest", "frontmatter", "chapters", "timestamps"]
+    },
+    {
+      "name": "notion-sources",
+      "source": "./notion-sources",
+      "version": "0.1.0",
+      "description": "Extract a Notion database into a batch of per-source Markdown files (one per row, YAML front matter) plus a manifest (sources.json + index.md). Schema-agnostic: detects URLs anywhere in a row and maps metadata by property type + fuzzy name, handling differently-structured databases. Re-runs append new sources. Standalone CLI: notion-sources.",
+      "category": "utilities",
+      "tags": ["notion", "ingest", "sources", "batch", "manifest", "frontmatter", "extract", "urls", "schema-agnostic"]
     }
   ]
 }
