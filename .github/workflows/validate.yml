@@ -1,0 +1,34 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate marketplace structure & version consistency
+        run: python3 .github/scripts/validate_marketplace.py
+
+      - name: Syntax-check install scripts
+        run: |
+          set -e
+          found=0
+          for f in install.sh */install.sh; do
+            [ -e "$f" ] || continue
+            found=1
+            echo "bash -n $f"
+            bash -n "$f"
+          done
+          [ "$found" = 1 ] || { echo "no install.sh scripts found"; exit 1; }
+
+      - name: Compile-check Python scripts
+        run: python3 -m compileall -q */scripts
