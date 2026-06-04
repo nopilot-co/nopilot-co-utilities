@@ -26,7 +26,7 @@
     {
       "name": "source-enrich",
       "source": "./source-enrich",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "description": "Enrich a notion-sources batch in place: fetch each source, fully populate its front matter, extract the article body to Markdown, download attached assets (inline images + linked documents) into assets/<slug>/, and append an Appendix. Tiered fetch (Python engine + youtube-transcript + an --html-file escalation path for auth-walled sources like LinkedIn). Resumable. Standalone CLI: source-enrich.",
       "category": "utilities",
       "tags": ["enrich", "scrape", "extract", "article", "readability", "frontmatter", "assets", "appendix", "ingest", "batch"]

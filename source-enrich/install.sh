@@ -23,8 +23,8 @@ if ! command -v python3 > /dev/null 2>&1; then
   exit 1
 fi
 
-echo "  • installing extraction deps (trafilatura + PyYAML + lxml_html_clean)…"
-python3 -m pip install --quiet --upgrade trafilatura PyYAML lxml_html_clean
+echo "  • installing extraction deps (trafilatura + PyYAML + lxml_html_clean + pypdf)…"
+python3 -m pip install --quiet --upgrade trafilatura PyYAML lxml_html_clean pypdf
 
 # ----------------------------------------------------------- 2. standalone CLI
 chmod +x "$SCRIPT"

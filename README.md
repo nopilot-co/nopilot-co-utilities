@@ -195,9 +195,9 @@ body, downloads attached assets, and appends an **Appendix** listing them. Resum
 approach.
 
 **Tiered fetch.** A standalone Python engine (`trafilatura`) reads normal pages;
-YouTube reuses the `youtube-transcript` CLI; sources the engine can't read
-(LinkedIn/X login walls, JS shells) are flagged **`blocked`** rather than producing
-garbage. Blocked sources are escalated **politely** — fetch the rendered HTML through
+**PDF** (and plaintext) sources are full-text-extracted via `pypdf`; YouTube reuses the
+`youtube-transcript` CLI; sources the engine can't read (LinkedIn/X login walls, JS
+shells) are flagged **`blocked`** rather than producing garbage. Blocked sources are escalated **politely** — fetch the rendered HTML through
 your *own logged-in browser* (`connect-chrome`) or Firecrawl and feed it back via
 `--html-file`. It never bypasses authentication.
 

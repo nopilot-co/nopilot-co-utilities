@@ -158,6 +158,66 @@ def fetch_html(url, timeout):
         return data.decode("utf-8", errors="replace"), status
 
 
+def extract_pdf(data):
+    """Extract full text from PDF bytes via pypdf. Returns markdown-ish text or None."""
+    try:
+        import io
+        import pypdf
+    except ImportError:
+        sys.stderr.write("error: pypdf not installed — run install.sh or `pip install pypdf`\n")
+        return None
+    try:
+        reader = pypdf.PdfReader(io.BytesIO(data))
+        parts = []
+        for page in reader.pages:
+            t = (page.extract_text() or "").strip()
+            if t:
+                parts.append(t)
+        return "\n\n".join(parts).strip() or None
+    except Exception:
+        return None
+
+
+def fetch_content(url, timeout):
+    """Fetch a source and classify it. Returns (kind, payload, status):
+    kind 'html' -> payload is HTML text; 'pdf'/'text' -> payload is extracted
+    full text (Markdown-ish); 'none' -> payload None (blocked)."""
+    try:
+        data, ctype, status = http_get(url, timeout, max_bytes=25 * 1024 * 1024)
+    except urllib.error.HTTPError as e:
+        return "none", None, f"http {e.code}"
+    except Exception as e:
+        return "none", None, str(e)[:80]
+    ctype_l = (ctype or "").lower()
+    bare = url.lower().split("?")[0]
+    if "application/pdf" in ctype_l or data[:5].lstrip().startswith(b"%PDF") or bare.endswith(".pdf"):
+        text = extract_pdf(data)
+        return ("pdf", text, status) if text else ("none", None, "pdf: no extractable text")
+    if "html" in ctype_l or data.lstrip()[:1] == b"<":
+        charset = "utf-8"
+        m = re.search(r"charset=([\w-]+)", ctype_l)
+        if m:
+            charset = m.group(1)
+        try:
+            return "html", data.decode(charset, errors="replace"), status
+        except LookupError:
+            return "html", data.decode("utf-8", errors="replace"), status
+    if ctype_l.startswith("text/") or bare.rsplit(".", 1)[-1] in ("txt", "md", "markdown", "csv"):
+        return "text", data.decode("utf-8", errors="replace"), status
+    return "none", None, f"unsupported type ({ctype_l or 'unknown'})"
+
+
+def _route_content(kind, payload, url):
+    """Map a fetch_content() result to (html, md, extractor) for process()."""
+    if kind == "html":
+        return payload, None, "trafilatura"
+    if kind == "pdf":
+        return None, payload, "pdf"
+    if kind == "text":
+        return None, payload, "text"
+    return None, None, "trafilatura"  # none / blocked
+
+
 # ----------------------------------------------------------------- html scanning
 class _Collector(HTMLParser):
     def __init__(self):
@@ -446,16 +506,18 @@ def process(entry, batch_dir, html_override, md_override, opts, hashes, log):
         if md:
             extractor, http_status = "youtube-transcript", "ok"
         else:
-            html, http_status = fetch_html(url, opts.timeout)
-            if html:
+            kind, payload, http_status = fetch_content(url, opts.timeout)
+            html, md, extractor = _route_content(kind, payload, url)
+            if kind == "html" and html:
                 md, meta = extract_article(html, url)
     else:
-        html, http_status = fetch_html(url, opts.timeout)
-        if html:
+        kind, payload, http_status = fetch_content(url, opts.timeout)
+        html, md, extractor = _route_content(kind, payload, url)
+        if kind == "html" and html:
             md, meta = extract_article(html, url)
 
     # 2. blocked?
-    if extractor in ("md-file", "youtube-transcript"):
+    if extractor in ("md-file", "youtube-transcript", "pdf", "text"):
         status = "enriched" if md else "blocked"
     elif html is None:
         status = "blocked"          # fetch failed (network / 4xx / 999 / not-html)
@@ -496,6 +558,13 @@ def process(entry, batch_dir, html_override, md_override, opts, hashes, log):
     final = "enriched"
     if opts.assets != "none" and catalogued and n_assets == 0:
         final = "partial"
+
+    # PDFs/plaintext carry no HTML metadata — derive a title from the first
+    # substantial line so the front matter isn't left as the raw URL.
+    if extractor in ("pdf", "text") and not meta.get("title") and md:
+        first = next((ln.strip() for ln in md.splitlines() if len(ln.strip()) > 12), "")
+        if first:
+            meta["title"] = " ".join(first.split())[:200]
 
     # 4. assemble body
     word_count = len((md or "").split())

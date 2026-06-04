@@ -27,8 +27,9 @@ On finish it prints per-status counts and a **`blocked` list** — those are the
 sources the Python engine couldn't read (login walls / JS). Report the summary.
 
 ### 2. What it does per source
-- **Fetch:** Python `trafilatura` for normal pages; YouTube reuses `yt-transcript`
-  if installed; otherwise the page is fetched and extracted to Markdown.
+- **Fetch:** Python `trafilatura` for normal pages; **PDF/plaintext** sources are
+  full-text-extracted (`pypdf`); YouTube reuses `yt-transcript` if installed;
+  otherwise the page is fetched and extracted to Markdown.
 - **Front matter:** fills nulls (`title`, `author`, `precis`, `published`,
   `source_name`, `lead_image`, `word_count`) and adds `enriched`, `enrich_status`,
   `enriched_at`, `extractor`, `http_status`, `assets_count`. It never overwrites the
