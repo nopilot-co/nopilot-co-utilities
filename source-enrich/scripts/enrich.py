@@ -173,7 +173,11 @@ def extract_pdf(data):
             t = (page.extract_text() or "").strip()
             if t:
                 parts.append(t)
-        return "\n\n".join(parts).strip() or None
+        text = "\n\n".join(parts).strip()
+        # strip NUL + non-printable control chars (keep \n, \t) so the .md stays
+        # plain text — PDF extraction can emit them and they break text tooling
+        text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+        return text or None
     except Exception:
         return None
 
