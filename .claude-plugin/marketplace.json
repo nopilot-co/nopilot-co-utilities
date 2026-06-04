@@ -42,7 +42,7 @@
     {
       "name": "theme-propose",
       "source": "./theme-propose",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "description": "STUB. Non-destructive theme-framework proposal + governing theme manifest. Digests the summarised sources, materialises a model-proposed framework (theme-proposal.md/.json) for the user to agree priorities + an editorial approach per theme, and freezes it into theme-manifest.json that governs all later theme-cluster/theme-entity runs. Never edits source files. Standalone CLI: theme-propose.",
       "category": "utilities",
       "tags": ["theme", "propose", "framework", "manifest", "editorial", "categorisation", "evidence-base", "stub"]

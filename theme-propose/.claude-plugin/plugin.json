@@ -1,6 +1,6 @@
 {
   "name": "theme-propose",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "STUB. Non-destructive theme-framework proposal for a summarised source batch, and the governing theme manifest. Builds a digest of every enriched/summarised source, materialises a model-proposed theme framework (theme-proposal.json + a human-editable theme-proposal.md), and freezes the agreed framework — theme priorities + an editorial approach per theme + categorisation guidance — into theme-manifest.json that governs all subsequent theme-cluster/theme-entity runs. Never edits source files. Standalone CLI: theme-propose.",
   "author": { "name": "Julian Tedstone", "email": "ted@nopilot.co" },
   "homepage": "https://github.com/nopilot-co/nopilot-co-utilities/tree/main/theme-propose",

@@ -22,18 +22,25 @@ This NEVER edits source files. It has three modes:
 
 Proposal JSON schema (model-produced, also the shape of an edited proposal):
   {
+    "icp": "who the evidence base serves — sourced from the messaging house (ICP)",
+    "icp_source": "path/ref to the canonical ICP (e.g. messaging/people.md)",
     "editorial": "overall angle / purpose / audience for the evidence base",
     "categorisation_guidance": "how sources should be assigned to themes",
     "themes": [
       { "id": "agentic-gtm", "label": "Agentic GTM", "description": "...",
         "rationale": "why this is a coherent discussion thread",
         "priority": 1,
+        "so_what": "why this theme matters to the ICP (the 'so what' angle)",
         "editorial_approach": "angle/what to foreground in this theme's dossier",
         "inclusion_criteria": "what qualifies a source for this theme",
         "candidate_members": ["<n|file>", ...] }
     ],
     "unthemed": ["<n>", ...]
   }
+
+The `icp` + per-theme `so_what` are project judgment, NOT plugin logic — they are
+carried as data, sourced from the messaging house (e.g. messaging/people.md), and
+frozen into theme-manifest.json so every downstream run inherits them.
 
 Usage:
   propose.py --batch DIR [--proposal-json FILE] [--adopt FILE]
@@ -92,9 +99,10 @@ def build_digest(batch, manifest):
 
 SCHEMA_HINT = (
     'proposal JSON schema:\n'
-    '  {"editorial":"...","categorisation_guidance":"...",\n'
+    '  {"icp":"who this serves (from messaging/people.md)","icp_source":"...",\n'
+    '   "editorial":"...","categorisation_guidance":"...",\n'
     '   "themes":[{"id","label","description","rationale","priority",\n'
-    '              "editorial_approach","inclusion_criteria","candidate_members":[]}],\n'
+    '              "so_what","editorial_approach","inclusion_criteria","candidate_members":[]}],\n'
     '   "unthemed":[]}'
 )
 
@@ -102,6 +110,8 @@ SCHEMA_HINT = (
 def render_proposal_md(prop):
     lines = ["# Theme framework — proposal", "",
              "_Review and edit, then adopt to freeze `theme-manifest.json`._", "",
+             "## ICP — who this serves (the 'so what' anchor)", "",
+             prop.get("icp") or "_TODO: ICP, sourced from messaging/people.md_", "",
              "## Editorial approach (overall)", "", prop.get("editorial") or "_TODO_", "",
              "## Categorisation guidance", "", prop.get("categorisation_guidance") or "_TODO_", "",
              "## Proposed themes (by priority)", ""]
@@ -112,6 +122,7 @@ def render_proposal_md(prop):
             f"### {t.get('priority', '?')}. {t.get('label')}  `{t.get('id')}`",
             "",
             f"- **Description:** {t.get('description', '')}",
+            f"- **So what (why it matters to the ICP):** {t.get('so_what', '')}",
             f"- **Why a coherent thread:** {t.get('rationale', '')}",
             f"- **Editorial approach:** {t.get('editorial_approach', '')}",
             f"- **Inclusion criteria:** {t.get('inclusion_criteria', '')}",
@@ -148,12 +159,14 @@ def main(argv=None):
         themes = sorted(prop.get("themes", []), key=lambda t: t.get("priority", 999))
         out = {
             "version": 1,
+            "icp": prop.get("icp"),
+            "icp_source": prop.get("icp_source"),
             "editorial": prop.get("editorial"),
             "categorisation_guidance": prop.get("categorisation_guidance"),
             "priorities": [t.get("id") for t in themes],
             "themes": [
                 {k: t.get(k) for k in ("id", "label", "description", "priority",
-                                       "editorial_approach", "inclusion_criteria")}
+                                       "so_what", "editorial_approach", "inclusion_criteria")}
                 for t in themes
             ],
         }

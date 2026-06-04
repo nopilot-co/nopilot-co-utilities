@@ -23,9 +23,14 @@ position, summary) of every enriched/summarised source. (Run `source-summarise`
 first so positions/summaries exist.)
 
 ### 2. Propose a framework (model)
-Read `theme-context.json` and propose a coherent theme framework — themes that are
-genuine *core discussion threads*, with priorities and a per-theme editorial
-approach. Emit proposal JSON (schema in the script docstring / `--help`):
+First, **load the ICP** from the project's messaging house (e.g.
+`messaging/people.md`, or the equivalent ICP/audience definition) — this is the
+"so what" anchor and is project judgment that does NOT live in the plugin. Carry it
+as data: set `icp` + `icp_source`, and give every theme a `so_what` (why it matters
+to the ICP). Then read `theme-context.json` and propose a coherent theme framework —
+themes that are genuine *core discussion threads*, with priorities, a per-theme
+editorial approach, and the `so_what`. Emit proposal JSON (schema in the script
+docstring / `--help`):
 ```json
 {
   "editorial": "overall angle, purpose, and audience of the evidence base",
