@@ -1,6 +1,6 @@
 {
   "name": "source-enrich",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Enrich a notion-sources batch in place: fetch each source, fully populate its YAML front matter, extract the article body to Markdown, download attached assets (inline images + linked documents) into assets/<slug>/, and append an Appendix listing them. Tiered fetch — a standalone Python engine for normal pages, reuse of youtube-transcript for YouTube, and an --html-file ingest path so auth-walled/JS sources (LinkedIn, X) flagged 'blocked' can be escalated through a logged-in browser or Firecrawl. Resumable. Standalone CLI: source-enrich.",
   "author": {
     "name": "Julian Tedstone",

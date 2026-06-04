@@ -13,7 +13,16 @@
       "version": "0.3.0",
       "description": "Extract a YouTube video's transcript to a .txt/.md — captions fast-path + optional local Whisper fallback, plus optional YAML front matter, timestamps & chapter sections. Standalone CLI: yt-transcript.",
       "category": "utilities",
-      "tags": ["youtube", "transcript", "captions", "subtitles", "ingest", "frontmatter", "chapters", "timestamps"]
+      "tags": [
+        "youtube",
+        "transcript",
+        "captions",
+        "subtitles",
+        "ingest",
+        "frontmatter",
+        "chapters",
+        "timestamps"
+      ]
     },
     {
       "name": "notion-sources",
@@ -21,15 +30,36 @@
       "version": "0.1.0",
       "description": "Extract a Notion database into a batch of per-source Markdown files (one per row, YAML front matter) plus a manifest (sources.json + index.md). Schema-agnostic: detects URLs anywhere in a row and maps metadata by property type + fuzzy name, handling differently-structured databases. Re-runs append new sources. Standalone CLI: notion-sources.",
       "category": "utilities",
-      "tags": ["notion", "ingest", "sources", "batch", "manifest", "frontmatter", "extract", "urls", "schema-agnostic"]
+      "tags": [
+        "notion",
+        "ingest",
+        "sources",
+        "batch",
+        "manifest",
+        "frontmatter",
+        "extract",
+        "urls",
+        "schema-agnostic"
+      ]
     },
     {
       "name": "source-enrich",
       "source": "./source-enrich",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "description": "Enrich a notion-sources batch in place: fetch each source, fully populate its front matter, extract the article body to Markdown, download attached assets (inline images + linked documents) into assets/<slug>/, and append an Appendix. Tiered fetch (Python engine + youtube-transcript + an --html-file escalation path for auth-walled sources like LinkedIn). Resumable. Standalone CLI: source-enrich.",
       "category": "utilities",
-      "tags": ["enrich", "scrape", "extract", "article", "readability", "frontmatter", "assets", "appendix", "ingest", "batch"]
+      "tags": [
+        "enrich",
+        "scrape",
+        "extract",
+        "article",
+        "readability",
+        "frontmatter",
+        "assets",
+        "appendix",
+        "ingest",
+        "batch"
+      ]
     },
     {
       "name": "source-summarise",
@@ -37,7 +67,15 @@
       "version": "0.0.1",
       "description": "STUB. Summarise each source in an enriched notion-sources batch — neutral digest, overall position, core arguments, and assessment of the comment-section reaction — into front matter + a Core summary section. Mechanical CLI + model-supplied JSON. Standalone CLI: source-summarise.",
       "category": "utilities",
-      "tags": ["summarise", "position", "arguments", "comments", "thought-leadership", "evidence-base", "stub"]
+      "tags": [
+        "summarise",
+        "position",
+        "arguments",
+        "comments",
+        "thought-leadership",
+        "evidence-base",
+        "stub"
+      ]
     },
     {
       "name": "theme-propose",
@@ -45,7 +83,16 @@
       "version": "0.0.2",
       "description": "STUB. Non-destructive theme-framework proposal + governing theme manifest. Digests the summarised sources, materialises a model-proposed framework (theme-proposal.md/.json) for the user to agree priorities + an editorial approach per theme, and freezes it into theme-manifest.json that governs all later theme-cluster/theme-entity runs. Never edits source files. Standalone CLI: theme-propose.",
       "category": "utilities",
-      "tags": ["theme", "propose", "framework", "manifest", "editorial", "categorisation", "evidence-base", "stub"]
+      "tags": [
+        "theme",
+        "propose",
+        "framework",
+        "manifest",
+        "editorial",
+        "categorisation",
+        "evidence-base",
+        "stub"
+      ]
     },
     {
       "name": "theme-cluster",
@@ -53,7 +100,16 @@
       "version": "0.0.2",
       "description": "STUB. Group sources in a notion-sources batch into themes (consistent core discussion threads), honouring the agreed theme-manifest.json from theme-propose — produces themes.json and optionally tags source front matter. Mechanical CLI + model-supplied assignment JSON. Standalone CLI: theme-cluster.",
       "category": "utilities",
-      "tags": ["theme", "cluster", "grouping", "discussion-thread", "manifest", "evidence-base", "thought-leadership", "stub"]
+      "tags": [
+        "theme",
+        "cluster",
+        "grouping",
+        "discussion-thread",
+        "manifest",
+        "evidence-base",
+        "thought-leadership",
+        "stub"
+      ]
     },
     {
       "name": "theme-entity",
@@ -61,7 +117,17 @@
       "version": "0.0.2",
       "description": "STUB. Build a theme entity doc per theme — summary, precis, notable contributions, key disagreements, comment-reaction assessment, and backlinks to contributing sources grouped by author and timeline — following the editorial approach in theme-manifest.json. Mechanical CLI + model-supplied synthesis JSON. Standalone CLI: theme-entity.",
       "category": "utilities",
-      "tags": ["theme", "entity", "synthesis", "manifest", "evidence-base", "backlinks", "timeline", "thought-leadership", "stub"]
+      "tags": [
+        "theme",
+        "entity",
+        "synthesis",
+        "manifest",
+        "evidence-base",
+        "backlinks",
+        "timeline",
+        "thought-leadership",
+        "stub"
+      ]
     }
   ]
 }

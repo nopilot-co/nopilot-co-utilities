@@ -429,6 +429,63 @@ def clean_author(a):
     return a or None
 
 
+def _author_from_title(title):
+    """Pull a human display name out of a page title where the host embeds it
+    (LinkedIn '... | Name | N comments', X 'Name on X', 'Name - Company | LinkedIn',
+    Medium 'by Name')."""
+    if not title:
+        return None
+    t = title.strip().strip('"').strip("'")
+    pats = [r'^(.{2,40}?)\s+on X[:"\s]', r'^(.{2,40}?)\s*\(@[^)]+\)\s*on X',
+            r'\|\s*([^|]{2,40}?)\s*\|\s*\d[\d,]*\s*comment', r'\|\s*([^|]{2,40}?)\s+posted on the topic',
+            r'^([A-Z][\w.\'’-]+(?:\s+[A-Z][\w.\'’-]+){0,2})\s*[-–]\s*.+\|\s*LinkedIn',
+            r'\|\s*([^|]{2,40}?)\s*\|\s*LinkedIn\s*$', r'\bby\s+([A-Z][\w.\'’-]+(?:\s+[A-Z][\w.\'’-]+){1,3})']
+    for p in pats:
+        m = re.search(p, t, re.I)
+        if m:
+            name = re.sub(r"[^\w\s.&'’-]", "", m.group(1)).strip()
+            if name and len(name) <= 40 and not name.lower().startswith("http"):
+                return name
+    # generic: a trailing pipe segment that is a plausible 2-3 word person name
+    parts = [p.strip() for p in t.split("|")]
+    if len(parts) >= 2:
+        c = parts[-1]
+        if re.fullmatch(r"[A-Z][\w.'’-]+(?:\s+[A-Z][\w.'’-]+){1,2}", c) and "LinkedIn" not in c:
+            return re.sub(r"[^\w\s.&'’-]", "", c).strip()
+    return None
+
+
+def _is_handle(a):
+    return bool(a) and " " not in a and bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", a))
+
+
+def tidy_author(author, title):
+    """Best human-readable byline from a possibly-messy author + the page title.
+    Keeps clean names; recovers names from the title for bare handles; strips
+    duplicate/'Published …' cruft; title-cases an unresolved handle."""
+    if not author:
+        return _author_from_title(title)
+    a = re.sub(r"\bPublished\b.*$", "", str(author).strip()).strip()
+    toks = a.split()
+    half = len(toks) // 2
+    if half and toks[:half] == toks[half:2 * half]:
+        a = " ".join(toks[:half])
+    # already a clean human / multi-author name → keep it
+    if " " in a and not re.search(r"[_]|\d", a) and a[:1].isupper() and not a.lower().startswith("http"):
+        return a
+    from_title = _author_from_title(title)
+    if from_title:
+        return from_title
+    if _is_handle(a):
+        b = re.sub(r"-share-.*$", "", a)
+        b = re.sub(r"-activity-.*$", "", b)
+        b = re.sub(r"(-[0-9a-z]*\d[0-9a-z]*)+$", "", b)
+        words = [w for w in re.split(r"[-_.]", b) if w and not w.isdigit()]
+        if words:
+            return " ".join(w if (w.isupper() and len(w) > 1) else w.capitalize() for w in words)
+    return a or None
+
+
 def build_appendix(saved_imgs, saved_docs, catalogued):
     lines = ["## Appendix — Assets", ""]
     n_img, n_doc = len(saved_imgs), len(saved_docs)
@@ -461,6 +518,11 @@ def enrich_front_matter(fm, meta, url, status, extractor, http_status, word_coun
     author = clean_author(meta.get("author"))
     if author and not fm.get("author"):
         fm["author"] = author
+    # tidy the byline: recover a human name from the title for bare handles,
+    # strip cruft, keep already-clean names
+    tidied = tidy_author(fm.get("author"), fm.get("title"))
+    if tidied:
+        fm["author"] = tidied
     if empty(fm.get("precis")) and meta.get("description"):
         fm["precis"] = meta["description"]
     # enrichment block (appended/overwritten, never touches Notion `status`)
